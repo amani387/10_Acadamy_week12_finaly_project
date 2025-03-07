@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```markdown
+# API Endpoints Documentation
 
-## Getting Started
+This document outlines the available API endpoints along with instructions on how to test them.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 1. Optimize Portfolio Endpoint
+
+**URL:**  
+`http://127.0.0.1:5000/api/optimize`
+
+**Method:**  
+`POST`
+
+**Headers:**  
+`Content-Type: application/json`
+
+**Body:**  
+Select "raw" and choose JSON as the data type. Enter the following JSON:
+```json
+{
+  "stocks": ["TSLA", "AAPL", "SPY"]
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Expected Response:**  
+On success, you should receive a JSON response similar to:
+```json
+{
+  "TSLA": 0.45,
+  "AAPL": 0.30,
+  "SPY": 0.25
+}
+```
+This means:
+- 45% of your money should be in TSLA
+- 30% in AAPL
+- 25% in SPY
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 2. Stock Analysis Endpoint
 
-## Learn More
+**URL:**  
+`http://127.0.0.1:5000/api/analyze`
 
-To learn more about Next.js, take a look at the following resources:
+**Method:**  
+`POST`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Headers:**  
+`Content-Type: application/json`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Body:**  
+```json
+{
+  "stocks": ["TSLA", "AAPL", "SPY"]
+}
+```
 
-## Deploy on Vercel
+**Expected Response:**  
+A successful analysis will return:
+```json
+{ 
+  "message": "EDA completed!" 
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 3. Stock Forecasting Endpoint
+
+**URL:**  
+`http://127.0.0.1:5000/api/forecast`
+
+**Method:**  
+`POST`
+
+**Headers:**  
+`Content-Type: application/json`
+
+**Body:**  
+```json
+{
+  "stocks": ["TSLA"]
+}
+```
+
+**Expected Response:**  
+The response will provide a forecast array (the example below is indicative):
+```json
+{
+  "forecast": [350.1, 351.2, 352.4, ...]
+}
+```
+```
