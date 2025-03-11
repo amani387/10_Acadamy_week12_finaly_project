@@ -1,0 +1,14 @@
+Flask
+flask-cors
+yfinance
+pandas
+numpy
+matplotlib
+seaborn
+statsmodels
+scipy
+tensorflow
+pmdarima
+sklearn
+scikit-learn
+pypfopt
