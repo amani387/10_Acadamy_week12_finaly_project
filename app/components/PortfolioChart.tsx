@@ -1,10 +1,18 @@
 "use client";
 
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-// Register necessary Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Register required components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function PortfolioChart({ data }: { data: { [key: string]: number } }) {
   const chartData = {
@@ -19,10 +27,21 @@ export default function PortfolioChart({ data }: { data: { [key: string]: number
     ],
   };
 
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" as const },
+      title: { display: true, text: "Optimized Portfolio Allocation" },
+    },
+    scales: {
+      x: { type: "category" as const },
+      y: { beginAtZero: true },
+    },
+  };
+
   return (
-    <div className="w-full md:w-1/2 lg:w-1/3 p-4">
-      <h2 className="text-xl font-bold text-center">Optimized Portfolio Allocation</h2>
-      <Pie data={chartData} />
+    <div className="portfolio-chart-container">
+      <Bar data={chartData} options={options} />
     </div>
   );
 }

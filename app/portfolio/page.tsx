@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import axios from "axios";
 import PortfolioChart from "../components/PortfolioChart";
@@ -10,41 +11,74 @@ export default function Portfolio() {
   const [portfolio, setPortfolio] = useState<{ [key: string]: number } | null>(null);
   const [forecast, setForecast] = useState<any | null>(null);
   const [riskMetrics, setRiskMetrics] = useState<any | null>(null);
+  const [loading, setLoading] = useState<string | null>(null);
 
   const handleOptimize = async () => {
-    const response = await axios.post("http://localhost:5000/api/optimize", { stocks: stocks.split(",") });
-    setPortfolio(response.data);
+    try {
+      setLoading("Optimizing Portfolio...");
+      const response = await axios.post("http://localhost:5000/api/optimize", {
+        stocks: stocks.split(",").map((s) => s.trim()),
+      });
+      setPortfolio(response.data);
+    } catch (error) {
+      console.error("Optimize API error:", error);
+      alert("Failed to optimize portfolio. Please try again.");
+    } finally {
+      setLoading(null);
+    }
   };
 
   const handleForecast = async () => {
-    const response = await axios.post("http://localhost:5000/api/forecast", { stocks: stocks.split(",") });
-    setForecast(response.data);
+    try {
+      setLoading("Fetching Forecast...");
+      const response = await axios.post("http://localhost:5000/api/forecast", {
+        stocks: stocks.split(",").map((s) => s.trim()),
+      });
+      setForecast(response.data);
+    } catch (error) {
+      console.error("Forecast API error:", error);
+      alert("Failed to fetch forecast. Please try again.");
+    } finally {
+      setLoading(null);
+    }
   };
 
   const handleRiskAnalysis = async () => {
-    const response = await axios.post("http://localhost:5000/api/market-trend", { stocks: stocks.split(",") });
-    setRiskMetrics(response.data);
+    try {
+      setLoading("Analyzing Risk...");
+      const response = await axios.post("http://localhost:5000/api/market-trend", {
+        stocks: stocks.split(",").map((s) => s.trim()),
+      });
+      setRiskMetrics(response.data);
+    } catch (error) {
+      console.error("Risk API error:", error);
+      alert("Failed to analyze risk. Please try again.");
+    } finally {
+      setLoading(null);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
-      <h1 className="text-3xl font-bold text-gray-800">Portfolio Optimizer</h1>
+    <div className="container">
+      <h1 className="title">Portfolio Optimizer</h1>
 
       <input
         type="text"
         value={stocks}
         onChange={(e) => setStocks(e.target.value)}
         placeholder="Enter stocks (e.g. TSLA, AAPL, SPY)"
-        className="mt-3 p-2 border rounded w-80"
+        className="input-field"
       />
 
-      <div className="flex flex-wrap justify-center gap-4 mt-4">
-        <button onClick={handleOptimize} className="px-4 py-2 bg-blue-600 text-white rounded">Optimize Portfolio</button>
-        <button onClick={handleForecast} className="px-4 py-2 bg-green-600 text-white rounded">Run Forecast</button>
-        <button onClick={handleRiskAnalysis} className="px-4 py-2 bg-red-600 text-white rounded">Analyze Risk</button>
+      <div className="button-container">
+        <button onClick={handleOptimize} className="button blue">Optimize Portfolio</button>
+        <button onClick={handleForecast} className="button green">Run Forecast</button>
+        <button onClick={handleRiskAnalysis} className="button red">Analyze Risk</button>
       </div>
 
-      <div className="flex flex-wrap justify-center mt-6 w-full">
+      {loading && <p className="loading">{loading}</p>}
+
+      <div className="chart-container">
         {portfolio && <PortfolioChart data={portfolio} />}
         {forecast && <ForecastChart data={forecast} />}
         {riskMetrics && <RiskMetrics riskData={riskMetrics} />}
