@@ -2,87 +2,110 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { Container, TextField, Button, Grid, Typography, Box } from "@mui/material";
 import PortfolioChart from "../components/PortfolioChart";
 import ForecastChart from "../components/ForecastChart";
 import RiskMetrics from "../components/RiskMetrics";
+import EfficientFrontierChart from "../components/EfficientFrontierChart";
 
 export default function Portfolio() {
   const [stocks, setStocks] = useState("");
   const [portfolio, setPortfolio] = useState<{ [key: string]: number } | null>(null);
   const [forecast, setForecast] = useState<any | null>(null);
   const [riskMetrics, setRiskMetrics] = useState<any | null>(null);
-  const [loading, setLoading] = useState<string | null>(null);
+  const [efficientFrontier, setEfficientFrontier] = useState<any | null>(null);
 
   const handleOptimize = async () => {
     try {
-      setLoading("Optimizing Portfolio...");
       const response = await axios.post("http://localhost:5000/api/optimize", {
-        stocks: stocks.split(",").map((s) => s.trim()),
+        stocks: stocks.split(","),
       });
       setPortfolio(response.data);
     } catch (error) {
       console.error("Optimize API error:", error);
-      alert("Failed to optimize portfolio. Please try again.");
-    } finally {
-      setLoading(null);
     }
   };
 
   const handleForecast = async () => {
     try {
-      setLoading("Fetching Forecast...");
       const response = await axios.post("http://localhost:5000/api/forecast", {
-        stocks: stocks.split(",").map((s) => s.trim()),
+        stocks: stocks.split(","),
       });
       setForecast(response.data);
     } catch (error) {
       console.error("Forecast API error:", error);
-      alert("Failed to fetch forecast. Please try again.");
-    } finally {
-      setLoading(null);
     }
   };
 
   const handleRiskAnalysis = async () => {
     try {
-      setLoading("Analyzing Risk...");
       const response = await axios.post("http://localhost:5000/api/market-trend", {
-        stocks: stocks.split(",").map((s) => s.trim()),
+        stocks: stocks.split(","),
       });
       setRiskMetrics(response.data);
     } catch (error) {
-      console.error("Risk API error:", error);
-      alert("Failed to analyze risk. Please try again.");
-    } finally {
-      setLoading(null);
+      console.error("Risk Analysis API error:", error);
+    }
+  };
+
+  const handleEfficientFrontier = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/efficient-frontier", {
+        stocks: stocks.split(","),
+      });
+      setEfficientFrontier(response.data);
+    } catch (error) {
+      console.error("Efficient Frontier API error:", error);
     }
   };
 
   return (
-    <div className="container">
-      <h1 className="title">Portfolio Optimizer</h1>
+    <Container maxWidth="md" sx={{ mt: 4, textAlign: "center" }}>
+      <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
+        Portfolio Optimizer
+      </Typography>
 
-      <input
-        type="text"
+      {/* Input Field for Stocks */}
+      <TextField
+        label="Enter Stocks (e.g., TSLA, AAPL, SPY)"
+        variant="outlined"
+        fullWidth
         value={stocks}
         onChange={(e) => setStocks(e.target.value)}
-        placeholder="Enter stocks (e.g. TSLA, AAPL, SPY)"
-        className="input-field"
+        sx={{ mb: 3 }}
       />
 
-      <div className="button-container">
-        <button onClick={handleOptimize} className="button blue">Optimize Portfolio</button>
-        <button onClick={handleForecast} className="button green">Run Forecast</button>
-        <button onClick={handleRiskAnalysis} className="button red">Analyze Risk</button>
-      </div>
+      {/* Action Buttons */}
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={handleOptimize}>
+            Optimize Portfolio
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" color="secondary" onClick={handleForecast}>
+            Run Forecast
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" color="success" onClick={handleRiskAnalysis}>
+            Analyze Risk
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" color="warning" onClick={handleEfficientFrontier}>
+            Show Efficient Frontier
+          </Button>
+        </Grid>
+      </Grid>
 
-      {loading && <p className="loading">{loading}</p>}
-
-      <div className="chart-container">
+      {/* Charts & Data Sections */}
+      <Box sx={{ mt: 5, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 4 }}>
         {portfolio && <PortfolioChart data={portfolio} />}
         {forecast && <ForecastChart data={forecast} />}
         {riskMetrics && <RiskMetrics riskData={riskMetrics} />}
-      </div>
-    </div>
+        {efficientFrontier && <EfficientFrontierChart data={efficientFrontier} />}
+      </Box>
+    </Container>
   );
 }

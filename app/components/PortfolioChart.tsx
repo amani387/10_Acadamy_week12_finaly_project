@@ -1,18 +1,11 @@
 "use client";
 
-import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Card, CardContent, Typography } from "@mui/material";
 
-// Register required components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+// Register required Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function PortfolioChart({ data }: { data: { [key: string]: number } }) {
   const chartData = {
@@ -21,27 +14,20 @@ export default function PortfolioChart({ data }: { data: { [key: string]: number
       {
         label: "Portfolio Allocation",
         data: Object.values(data),
-        backgroundColor: ["#3498db", "#2ecc71", "#e74c3c"],
+        backgroundColor: ["#1976d2", "#dc004e", "#ff9800"],
         hoverOffset: 4,
       },
     ],
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" as const },
-      title: { display: true, text: "Optimized Portfolio Allocation" },
-    },
-    scales: {
-      x: { type: "category" as const },
-      y: { beginAtZero: true },
-    },
-  };
-
   return (
-    <div className="portfolio-chart-container">
-      <Bar data={chartData} options={options} />
-    </div>
+    <Card sx={{ maxWidth: 500, margin: "auto", boxShadow: 3 }}>
+      <CardContent>
+        <Typography variant="h6" fontWeight="bold" color="primary" textAlign="center">
+          Optimized Portfolio Allocation
+        </Typography>
+        <Pie data={chartData} />
+      </CardContent>
+    </Card>
   );
 }

@@ -37,9 +37,11 @@ CORS(app)  # Allow cross-origin requests
 def fetch_stock_data(tickers, start="2015-01-01", end="2025-01-01"):
     """Fetch historical closing prices from Yahoo Finance."""
     data = yf.download(tickers, start=start, end=end)
+    
     if data.empty:
-        raise ValueError("No data fetched. Please check the tickers and dates.")
-    return data["Close"]
+        raise ValueError("No data fetched. Please check the stock tickers.")
+    
+    return data["Close"].fillna(method="ffill")  # Fill missing values
 
 def check_stationarity(timeseries):
     """Perform Augmented Dickey-Fuller test and print results."""
@@ -89,50 +91,6 @@ def analyze():
         return jsonify({"error": str(e)}), 500
 
 # Endpoint 2: ARIMA Forecasting with Confidence Intervals
-@app.route("/api/forecast", methods=["POST"])
-def forecast():
-    try:
-        tickers = [ticker.strip() for ticker in request.json.get("stocks", []) if ticker.strip()]
-        if not tickers:
-            return jsonify({"error": "No valid stock tickers provided."}), 400
-
-        ticker = tickers[0]
-        df = yf.download(ticker, start="2015-01-01", end="2025-01-01")
-
-        if df.empty:
-            return jsonify({"error": f"No data found for ticker {ticker}."}), 400
-
-        data = df["Close"].dropna()  # Ensure using closing price
-
-        train_size = int(len(data) * 0.85)
-        train, test = data[:train_size], data[train_size:]
-
-        # Fit ARIMA model
-        model = ARIMA(train, order=(5, 1, 0))
-        model_fit = model.fit()
-        forecast_values = model_fit.forecast(steps=len(test))
-
-        # Ensure forecast_values is a NumPy array
-        forecast_values = np.array(forecast_values)
-
-        # Compute standard error for confidence intervals
-        if len(test) > 0:
-            std_err = np.std(forecast_values - test.values)
-            lower_bound = forecast_values - 1.96 * std_err
-            upper_bound = forecast_values + 1.96 * std_err
-        else:
-            lower_bound = forecast_values
-            upper_bound = forecast_values
-
-        return jsonify({
-            "ticker": ticker,
-            "forecast": forecast_values.tolist(),
-            "lower_bound": lower_bound.tolist(),
-            "upper_bound": upper_bound.tolist()
-        })
-    except Exception as e:
-        logging.exception("Error in /api/forecast")
-        return jsonify({"error": str(e)}), 500
 
 # Endpoint 3: Market Trend Analysis & Risk Metrics (VaR and Rolling Volatility)
 @app.route("/api/market-trend", methods=["POST"])
@@ -200,35 +158,57 @@ def efficient_frontier():
         if not tickers:
             return jsonify({"error": "No valid stocks provided."}), 400
 
-        # Fetch data and compute portfolio optimization metrics (expected returns, covariance, etc.)
         stock_data = fetch_stock_data(tickers)
         daily_returns = stock_data.pct_change().dropna()
+        if daily_returns.empty:
+            return jsonify({"error": "Insufficient data for the given stocks."}), 400
+
         expected_returns = daily_returns.mean() * 252
         cov_matrix = daily_returns.cov() * 252
 
-        # Simulate random portfolios for the efficient frontier
-        num_portfolios = 10000
-        ret_arr = np.zeros(num_portfolios)
-        vol_arr = np.zeros(num_portfolios)
-        sharpe_arr = np.zeros(num_portfolios)
-        
-        for i in range(num_portfolios):
+        num_portfolios = 5000
+        random_portfolios = []
+
+        for _ in range(num_portfolios):
             weights = np.random.random(len(tickers))
             weights /= np.sum(weights)
-            ret_arr[i] = np.dot(weights, expected_returns)
-            vol_arr[i] = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-            sharpe_arr[i] = ret_arr[i] / vol_arr[i]
+            port_return = np.dot(weights, expected_returns)
+            port_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+            sharpe_ratio = port_return / port_volatility if port_volatility != 0 else 0
 
-        # Plot efficient frontier
+            random_portfolios.append({
+                "volatility": float(port_volatility),  # Ensure values are JSON serializable
+                "return": float(port_return),
+                "sharpe_ratio": float(sharpe_ratio)
+            })
+
+        # Ensure there is at least one valid portfolio
+        if not random_portfolios:
+            return jsonify({"error": "Failed to generate portfolios"}), 500
+
+        # Select max Sharpe ratio portfolio
+        max_sharpe_portfolio = max(random_portfolios, key=lambda p: p["sharpe_ratio"])
+
+        # Generate Plot
         fig, ax = plt.subplots(figsize=(12, 6))
-        sc = ax.scatter(vol_arr, ret_arr, c=sharpe_arr, cmap='viridis', marker='o', s=10, alpha=0.3)
+        sc = ax.scatter(
+            [p["volatility"] for p in random_portfolios],
+            [p["return"] for p in random_portfolios],
+            c=[p["sharpe_ratio"] for p in random_portfolios],
+            cmap='viridis', marker='o', s=10, alpha=0.3
+        )
         plt.colorbar(sc, label='Sharpe Ratio')
+        ax.scatter(
+            max_sharpe_portfolio["volatility"], max_sharpe_portfolio["return"],
+            marker='*', color='red', s=200, label="Max Sharpe Ratio"
+        )
         ax.set_xlabel('Volatility')
         ax.set_ylabel('Expected Return')
         ax.set_title('Efficient Frontier')
+        ax.legend()
         plt.tight_layout()
 
-        # Save plot to a bytes buffer and encode as Base64
+        # Convert plot to Base64
         buf = io.BytesIO()
         plt.savefig(buf, format="png")
         buf.seek(0)
@@ -236,8 +216,17 @@ def efficient_frontier():
         buf.close()
         plt.close(fig)
 
-        return jsonify({"efficient_frontier_image": img_base64})
+        return jsonify({
+            "efficient_frontier_image": img_base64,
+            "random_portfolios": random_portfolios,
+            "optimized_portfolio": max_sharpe_portfolio
+        })
+
     except Exception as e:
+        logging.exception("Error in /api/efficient-frontier")
         return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+

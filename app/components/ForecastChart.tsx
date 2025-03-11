@@ -1,22 +1,13 @@
 "use client";
 
 import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-  Title,
-} from "chart.js";
+import { Chart as ChartJS, LineElement, PointElement, Tooltip, Legend, CategoryScale, LinearScale } from "chart.js";
+import { Card, CardContent, Typography } from "@mui/material";
 
-// Register necessary components for a line chart
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, Title);
+// Register required Chart.js components
+ChartJS.register(LineElement, PointElement, Tooltip, Legend, CategoryScale, LinearScale);
 
 export default function ForecastChart({ data }: { data: any }) {
-  // Generate labels based on forecast length
   const labels = Array.from({ length: data.forecast.length }, (_, i) => `Day ${i + 1}`);
 
   const chartData = {
@@ -25,7 +16,7 @@ export default function ForecastChart({ data }: { data: any }) {
       {
         label: "Forecasted Price",
         data: data.forecast,
-        borderColor: "#3498db",
+        borderColor: "#1976d2",
         fill: false,
       },
       {
@@ -45,27 +36,14 @@ export default function ForecastChart({ data }: { data: any }) {
     ],
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" as const },
-      title: { display: true, text: "Stock Forecast with Confidence Intervals" },
-    },
-    scales: {
-      x: { type: "category" as const },
-      y: { beginAtZero: false },
-    },
-  };
-
   return (
-    <div className="w-full p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-      <div className="text-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Stock Price Forecast</h2>
-        <p className="text-sm text-gray-600">Prediction with confidence intervals</p>
-      </div>
-      <div className="w-full">
-        <Line data={chartData} options={options} />
-      </div>
-    </div>
+    <Card sx={{ maxWidth: 600, margin: "auto", boxShadow: 3 }}>
+      <CardContent>
+        <Typography variant="h6" fontWeight="bold" color="primary" textAlign="center">
+          Stock Forecast
+        </Typography>
+        <Line data={chartData} />
+      </CardContent>
+    </Card>
   );
 }
