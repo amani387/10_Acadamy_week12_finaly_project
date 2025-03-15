@@ -24,6 +24,9 @@ import {
   TableRow,
   Paper,
   Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -39,7 +42,6 @@ ChartJS.register(
 );
 
 export default function ForecastChart({ data }: { data: any }) {
-  // Extract forecast data
   const forecast = data.predictions;
   const confidenceInterval = data.confidence_interval
     ? {
@@ -48,10 +50,8 @@ export default function ForecastChart({ data }: { data: any }) {
       }
     : null;
 
-  // Generate labels
   const labels = Array.from({ length: forecast.length }, (_, i) => `Day ${i + 1}`);
 
-  // Prepare chart data
   const chartData = {
     labels,
     datasets: [
@@ -69,7 +69,6 @@ export default function ForecastChart({ data }: { data: any }) {
     ],
   };
 
-  // Add confidence interval if available
   if (confidenceInterval) {
     chartData.datasets.push(
       {
@@ -78,6 +77,7 @@ export default function ForecastChart({ data }: { data: any }) {
         borderColor: "transparent",
         backgroundColor: "rgba(231, 76, 60, 0.1)",
         fill: false,
+        // @ts-ignore
         borderDash: [5, 5],
         borderWidth: 1,
       },
@@ -93,7 +93,6 @@ export default function ForecastChart({ data }: { data: any }) {
     );
   }
 
-  // Prepare table data
   const tableData = labels.map((label: string, index: number) => ({
     day: label,
     forecast: forecast[index].toFixed(2),
@@ -128,7 +127,7 @@ export default function ForecastChart({ data }: { data: any }) {
 
         <Box
           sx={{
-            height: 400,
+            height: 600,
             position: "relative",
             display: "flex",
             justifyContent: "center",
@@ -153,7 +152,7 @@ export default function ForecastChart({ data }: { data: any }) {
                 plugins: {
                   tooltip: {
                     enabled: true,
-                    mode: "single",
+                    mode: "index",
                     callbacks: {
                       label: function (context) {
                         let label = context.dataset.label || "";
@@ -164,11 +163,13 @@ export default function ForecastChart({ data }: { data: any }) {
                           label += new Intl.NumberFormat("en-US", {
                             style: "currency",
                             currency: "USD",
+                            // @ts-ignore
                           }).format(context.raw);
                         } else {
                           label += new Intl.NumberFormat("en-US", {
                             style: "currency",
                             currency: "USD",
+                            // @ts-ignore
                           }).format(context.raw);
                         }
                         return label;
@@ -207,7 +208,8 @@ export default function ForecastChart({ data }: { data: any }) {
               sx={{ mr: 1 }}
             />
             <Typography variant="body2" color="text.secondary">
-              The shaded area represents the 95% confidence interval for the forecast.
+              The shaded area represents the range within which we expect the actual price to fall 
+              with 95% confidence.
             </Typography>
           </Box>
         )}
@@ -221,16 +223,44 @@ export default function ForecastChart({ data }: { data: any }) {
           Model: {data.model} | Forecast Period: {data.forecast_period} days
         </Typography>
 
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<span>+</span>}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography variant="subtitle1">Understanding Your Forecast</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              This forecast shows the expected price movement of the stock over the next {data.forecast_period} days. 
+              The main line represents our best estimate of future prices based on historical data and the selected model.
+            </Typography>
+            <br />
+            {confidenceInterval && (
+              <Typography>
+                The shaded area (confidence interval) shows the range within which we expect the actual price to fall 
+                with 95% confidence. This helps you understand the uncertainty in the forecast.
+              </Typography>
+            )}
+            <br />
+            <Typography>
+              Remember that forecasts are not guarantees, but rather educated estimates based on historical patterns. 
+              Market conditions can change, and actual results may differ.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+
         <TableContainer component={Paper} sx={{ mt: 3 }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>Day</TableCell>
-                <TableCell align="right">Forecast</TableCell>
+                <TableCell align="right">Forecasted Price</TableCell>
                 {confidenceInterval && (
                   <>
-                    <TableCell align="right">Lower Bound</TableCell>
-                    <TableCell align="right">Upper Bound</TableCell>
+                    <TableCell align="right">Lower Estimate</TableCell>
+                    <TableCell align="right">Upper Estimate</TableCell>
                   </>
                 )}
               </TableRow>

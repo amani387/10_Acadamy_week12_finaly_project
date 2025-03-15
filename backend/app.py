@@ -34,6 +34,7 @@ CORS(app)  # Allow cross-origin requests
 # ---------------------------
 # HELPER FUNCTIONS
 # ---------------------------
+
 def portfolio_volatility(weights, expected_returns, cov_matrix):
     """
     Calculate portfolio volatility.

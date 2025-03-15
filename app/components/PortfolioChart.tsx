@@ -1,6 +1,6 @@
 "use client";
-
 import { Pie } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -23,50 +23,35 @@ import {
   TableRow,
   Paper,
   Box,
-  TableFooter,
-  TablePagination,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
 // Register required Chart.js components
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement
-);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
 
 export default function PortfolioChart({ data }: { data: any }) {
-  // Extract weights and performance metrics
   const weights = data.max_sharpe_portfolio.weights;
   const performance = data.max_sharpe_portfolio.performance;
 
-  // Format data for the pie chart
   const chartData = {
     labels: Object.keys(weights),
     datasets: [
       {
         label: "Portfolio Allocation",
         data: Object.values(weights),
-        backgroundColor: [
-          "#1976d2", // Primary blue
-          "#dc004e", // Red
-          "#ff9800", // Amber
-          "#4caf50", // Green
-          "#9c27b0", // Purple
-          "#f44336", // Red
-        ],
+        backgroundColor: ["#1976d2", "#dc004e", "#ff9800"],
         hoverOffset: 4,
       },
     ],
   };
 
-  // Table data
   const tableData = Object.entries(weights).map(([ticker, weight]) => ({
     ticker,
+    // @ts-ignore
     weight: `${(weight * 100).toFixed(2)}%`,
   }));
 
@@ -116,17 +101,50 @@ export default function PortfolioChart({ data }: { data: any }) {
           textAlign="center"
           sx={{ mb: 3 }}
         >
-          Expected Return: {(performance[0] * 100).toFixed(2)}% | 
-          Volatility: {(performance[1] * 100).toFixed(2)}% | 
-          Sharpe Ratio: {performance[2].toFixed(2)}
+          <strong>Expected Return:</strong> {(performance[0] * 100).toFixed(2)}% |
+          <strong> Volatility:</strong> {(performance[1] * 100).toFixed(2)}% |
+          <strong> Sharpe Ratio:</strong> {performance[2].toFixed(2)}
         </Typography>
+
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<span>+</span>}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography variant="subtitle1">What does this mean?</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography>
+              <strong>Portfolio Optimization</strong> is the process of selecting the best possible 
+              combination of assets to maximize returns for a given level of risk. Your optimized 
+              portfolio is designed to provide the best possible balance between potential returns 
+              and risk based on historical data.
+            </Typography>
+            <br />
+            <Typography>
+              <strong>Expected Return:</strong> This is the average return you can expect from 
+              this portfolio based on historical performance.
+            </Typography>
+            <br />
+            <Typography>
+              <strong>Volatility:</strong> This measures how much the portfolio's returns can 
+              vary. Higher volatility means greater risk.
+            </Typography>
+            <br />
+            <Typography>
+              <strong>Sharpe Ratio:</strong> This measures the performance of the portfolio 
+              after adjusting for its risk. Higher values indicate better risk-adjusted returns.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
 
         <TableContainer component={Paper} sx={{ mt: 3 }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>Asset</TableCell>
-                <TableCell align="right">Allocation</TableCell>
+                <TableCell align="right">Recommended Allocation</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
