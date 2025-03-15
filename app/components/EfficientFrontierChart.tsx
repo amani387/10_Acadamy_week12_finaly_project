@@ -3,13 +3,22 @@
 import { Scatter } from "react-chartjs-2";
 import { Chart as ChartJS, PointElement, LinearScale, Tooltip, Legend } from "chart.js";
 import React from "react";
+import { Card, CardContent, Typography } from "@mui/material";
 
 // Register necessary Chart.js components
 ChartJS.register(PointElement, LinearScale, Tooltip, Legend);
 
 export default function EfficientFrontierChart({ data }: { data: any }) {
   if (!data || !data.random_portfolios || data.random_portfolios.length === 0) {
-    return <div className="text-center text-gray-500">No portfolio data available.</div>;
+    return (
+      <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+        <CardContent>
+          <Typography variant="h6" fontWeight="bold" color="primary" textAlign="center">
+            No portfolio data available.
+          </Typography>
+        </CardContent>
+      </Card>
+    );
   }
 
   const scatterData = {
@@ -29,17 +38,21 @@ export default function EfficientFrontierChart({ data }: { data: any }) {
   };
 
   return (
-    <div className="w-full p-4">
-      <h2 className="text-xl font-bold text-center">Efficient Frontier</h2>
-      <Scatter
-        data={scatterData}
-        options={{
-          scales: {
-            x: { title: { display: true, text: "Volatility" } },
-            y: { title: { display: true, text: "Expected Return" } },
-          },
-        }}
-      />
-    </div>
+    <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+      <CardContent>
+        <Typography variant="h6" fontWeight="bold" color="primary" textAlign="center" gutterBottom>
+          Efficient Frontier
+        </Typography>
+        <Scatter
+          data={scatterData}
+          options={{
+            scales: {
+              x: { title: { display: true, text: "Volatility" } },
+              y: { title: { display: true, text: "Expected Return" } },
+            },
+          }}
+        />
+      </CardContent>
+    </Card>
   );
 }

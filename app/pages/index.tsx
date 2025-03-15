@@ -1,6 +1,7 @@
-"use client";
+// pages/index.tsx
+'use client'
 import React, { useState } from "react";
-import { useRouter } from 'next/navigation';  // Import useRouter from Next.js for navigation
+import { useRouter } from 'next/router';  // Import useRouter from Next.js for navigation
 
 import {
   CssBaseline,
@@ -105,7 +106,14 @@ const App = () => {
           padding: "20px",
         }}
       >
-        <Container maxWidth="lg" sx={{ zIndex: 1 }}>
+        <Container  maxWidth="lg"
+  sx={{
+    mt: 5,
+    textAlign: "center",
+    backgroundColor: "#f5f5f5", // Light gray background color
+    padding: 4, // Optional, for some padding
+    borderRadius: 2, // Optional, for rounded corners
+  }}>
           {/* Dark/Light Mode Toggle */}
           <Box sx={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
             <Switch
@@ -124,13 +132,8 @@ const App = () => {
               Time Series Forecasting & Portfolio Optimization
             </Typography>
             <Typography variant="h6" color="textSecondary" paragraph>
-              Welcome to a cutting-edge platform designed to help you make smarter investment decisions. 
-              With our suite of powerful tools, you can seamlessly integrate advanced predictive models 
-              and analytics into your portfolio management strategy. Whether you're an experienced investor 
-              or just getting started, our platform offers the insights needed to optimize your investments, 
-              reduce risks, and improve overall performance.
+              A seamless platform to improve investment decisions with powerful predictive models and analytics.
             </Typography>
-           
 
             <Grid container spacing={4} justifyContent="center">
               <Grid item xs={12} sm={6} md={4}>
@@ -139,13 +142,12 @@ const App = () => {
                     <Typography variant="h5" component="div">
                       Portfolio Optimization
                     </Typography>
-                    <Typography variant="body2" color="textSecondary"  paragraph>
-                      Optimize your investment portfolio with advanced techniques and real-time data, 
-                      ensuring that your investments are always aligned with your financial goals and risk tolerance.
+                    <Typography variant="body2" color="textSecondary" paragraph>
+                      Optimize your investment portfolio with advanced techniques and real-time data.
                     </Typography>
-                    <Button variant="contained" color="primary" fullWidth onClick={navigateToPortfolio}>
-                      Get Started
-                    </Button>
+                    <Button variant="contained" color="primary" onClick={navigateToPortfolio}>
+                    Get Started
+      </Button>
                   </CardContent>
                 </Card>
               </Grid>
@@ -156,14 +158,14 @@ const App = () => {
                       Forecasting Models
                     </Typography>
                     <Typography variant="body2" color="textSecondary" paragraph>
-                      Utilize advanced forecasting models to predict market trends and make informed decisions, 
-                      enabling you to stay ahead in the dynamic world of finance.
+                      Utilize advanced forecasting models to predict market trends and make informed decisions.
                     </Typography>
-                    <Button variant="contained" color="primary" fullWidth onClick={navigateToPortfolio}>
-                      Get Started
-                    </Button>
+                    <Button variant="contained" color="primary" onClick={navigateToPortfolio}>
+                    Get Started
+      </Button>
                   </CardContent>
                 </Card>
+         
               </Grid>
             </Grid>
           </Box>
