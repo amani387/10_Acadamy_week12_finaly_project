@@ -27,6 +27,7 @@ This project integrates **Time Series Forecasting** with **Portfolio Optimizatio
 - **Axios** for API calls
 
 ## 📂 **Project Structure**
+FOR THE FRONTEND IT IS INTHE SAME FOLDER IN THE WHOLE PROJECT 
 ```
 📦 project-root
 ├── 📁 backend
