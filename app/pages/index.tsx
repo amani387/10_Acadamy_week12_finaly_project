@@ -16,6 +16,7 @@ import {
   Container,
   Grid,
 } from "@mui/material";
+import Link from "next/link";
 
 // Toggle theme logic
 const App = () => {
@@ -145,9 +146,11 @@ const App = () => {
                     <Typography variant="body2" color="textSecondary" paragraph>
                       Optimize your investment portfolio with advanced techniques and real-time data.
                     </Typography>
-                    <Button variant="contained" color="primary" onClick={navigateToPortfolio}>
+                    {/* <Button variant="contained" color="primary" onClick={navigateToPortfolio}>
                     Get Started
-      </Button>
+      </Button> */}
+      <Link href={"/portfolio"}>Get Started</Link>
+
                   </CardContent>
                 </Card>
               </Grid>
