@@ -68,7 +68,6 @@ python app.py  # Start Flask server
 
 ### **3️⃣ Frontend Setup**
 ```bash
-cd frontend
 npm install  # or npm install
 npm run dev      # Start Next.js frontend
 ```
