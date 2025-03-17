@@ -1,7 +1,7 @@
 # **Portfolio Management & Time Series Forecasting**
 
 ## 📌 **Project Overview**
-This project integrates **Time Series Forecasting** with **Portfolio Optimization** to enhance investment decision-making. It uses **ARIMA, LSTM, and Modern Portfolio Theory (MPT)** to analyze stock trends, assess market risks, and suggest optimized portfolio allocations.
+This project integrates **Time Series Forecasting** with **Portfolio Optimization** to enhance investment decision-making. It uses **ARIMA,SARIMA, LSTM, and Modern Portfolio Theory (MPT)** to analyze stock trends, assess market risks, and suggest optimized portfolio allocations.
 
 ## 🚀 **Features**
 - **Stock Data Fetching**: Uses Yahoo Finance API to fetch historical stock prices.
