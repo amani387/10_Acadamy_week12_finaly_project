@@ -29,7 +29,7 @@ warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-CORS(app)  # Allow cross-origin requests
+CORS(app,resources={r"/*": {"origins": "*"}})  # Allow cross-origin requests
 
 # ---------------------------
 # HELPER FUNCTIONS
