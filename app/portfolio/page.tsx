@@ -60,7 +60,7 @@ export default function Portfolio() {
     setLoading(true);
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/${endpoint}`,
+        `https://next-public-api.onrender.com/api/${endpoint}`,
         {
           stocks: stocks.split(","),
           ...params,
